@@ -62,6 +62,20 @@ header{position:sticky;top:env(safe-area-inset-top,0px);z-index:50;background:rg
 .nav ul a:hover{color:var(--ink)}
 .nav .btn{padding:.6rem 1.05rem;font-size:.86rem}
 @media (max-width:940px){.nav ul{display:none}}
+.nav-r{display:flex;align-items:center;gap:.5rem}
+.menu-btn{display:none;width:44px;height:44px;border-radius:50%;border:1px solid var(--line);background:var(--surface);cursor:pointer;place-items:center;flex:none}
+.menu-btn svg{width:20px;height:20px;stroke:var(--ink);stroke-width:2;fill:none}
+.menu-btn .x{display:none}
+.menu-btn[aria-expanded="true"] .x{display:block}
+.menu-btn[aria-expanded="true"] .bars{display:none}
+.mnav{border-top:1px solid var(--line);background:var(--bg);max-height:calc(100svh - 66px);overflow-y:auto}
+.mnav ul{list-style:none;margin:0;padding:.4rem 0 1.2rem}
+.mnav li a{display:flex;justify-content:space-between;align-items:center;padding:1rem 0;border-bottom:1px solid var(--line);text-decoration:none;font-weight:700;font-size:1.15rem}
+.mnav li a::after{content:"→";color:var(--orange);font-weight:400}
+.mnav .mfoot{display:grid;gap:.7rem;padding-bottom:1.4rem}
+.mnav .mfoot small{color:var(--muted);font-size:.85rem}
+@media (max-width:940px){.menu-btn{display:grid}}
+@media (max-width:420px){.nav .nav-r .btn{display:none}}
 
 /* Hero con el local de fondo */
 .hero{position:relative;border-top:0;padding-block:clamp(88px,14vw,170px) clamp(56px,8vw,96px);overflow:hidden;isolation:isolate}
@@ -223,8 +237,28 @@ footer a:hover{color:var(--orange)}
       <li><a href="#suzuki">Suzuki</a></li>
       <li><a href="#preguntas">Preguntas</a></li>
     </ul>
-    <a class="btn" href="#contacto">Pedir información</a>
+    <div class="nav-r">
+      <a class="btn" href="#contacto">Pedir información</a>
+      <button class="menu-btn" id="menu-btn" type="button" aria-label="Abrir menú" aria-expanded="false" aria-controls="mnav"><svg class="bars" viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></svg><svg class="x" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+    </div>
   </div>
+  <nav class="mnav" id="mnav" hidden aria-label="Menú">
+    <div class="wrap">
+      <ul>
+        <li><a href="#inicio">Inicio</a></li>
+        <li><a href="#servicios">Servicios</a></li>
+        <li><a href="#porque">Por qué aquí</a></li>
+        <li><a href="#carpetas">Stock y clientes</a></li>
+        <li><a href="#suzuki">Suzuki</a></li>
+        <li><a href="#preguntas">Preguntas</a></li>
+        <li><a href="#contacto">Contacto</a></li>
+      </ul>
+      <div class="mfoot">
+        <a class="btn" href="https://wa.me/34634381818" target="_blank" rel="noopener">Escribir por WhatsApp</a>
+        <small>634 38 18 18 · Lun–Vie 9:00–13:00 y 15:30–19:00 · Sáb 9:00–13:00</small>
+      </div>
+    </div>
+  </nav>
 </header>
 
 <main>
@@ -443,6 +477,16 @@ $("v-close").addEventListener("click",closeFolder);
 addEventListener("keydown",e=>{if(e.key==="Escape"&&!$("viewer").hidden)closeFolder()});
 $("v-chips").addEventListener("click",e=>{const b=e.target.closest(".chip");if(!b)return;filter=b.dataset.f;renderChips();renderGrid()});
 $("v-q").addEventListener("input",renderGrid);
+
+// Menú móvil
+(function(){
+  const btn=$("menu-btn"),nav=$("mnav");
+  const set=o=>{nav.hidden=!o;btn.setAttribute("aria-expanded",o);btn.setAttribute("aria-label",o?"Cerrar menú":"Abrir menú")};
+  btn.addEventListener("click",()=>set(nav.hidden));
+  nav.addEventListener("click",e=>{if(e.target.closest("a"))set(false)});
+  addEventListener("keydown",e=>{if(e.key==="Escape"&&!nav.hidden){set(false);btn.focus()}});
+  addEventListener("resize",()=>{if(innerWidth>940&&!nav.hidden)set(false)});
+})();
 
 // Copiar
 document.querySelectorAll("[data-copy]").forEach(b=>b.addEventListener("click",()=>{
